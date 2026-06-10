@@ -1,0 +1,41 @@
+# Секреты — НИКОГДА не коммитим (они идут в GitHub Secrets)
+.env
+credentials.json
+authorized_user.json
+schools.json
+*.session
+*.session-journal
+
+# Ключи и временное
+deploy/finbot_key
+deploy/finbot_key.pub
+*.key
+*.pub
+*.png
+bot_log.txt
+login_output.txt
+recover_out.txt
+verify_out.txt
+finbot.tar.gz
+.claude/
+
+# Токен (на всякий случай)
+token.txt
+
+# Вспомогательные/одноразовые скрипты — НЕ публикуем (содержат номер телефона, ID и т.п.)
+login_telegram.py
+generate_session.py
+setup_google.py
+auto_google_setup.py
+recover.py
+verify_schools.py
+run_setup.bat
+ВОЙТИ.bat
+SETUP.md
+.env.example
+deploy/
+
+# Python
+__pycache__/
+*.pyc
+venv/

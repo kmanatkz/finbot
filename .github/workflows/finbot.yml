@@ -1,0 +1,52 @@
+name: finbot catchup
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # каждые 10 минут
+  workflow_dispatch: {}        # ручной запуск кнопкой
+
+permissions:
+  contents: write              # чтобы сохранять state.json между запусками
+
+concurrency:
+  group: finbot
+  cancel-in-progress: false
+
+jobs:
+  catchup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Write secret files
+        run: |
+          printf '%s' "$GOOGLE_CREDENTIALS_JSON" > credentials.json
+          printf '%s' "$GOOGLE_AUTHORIZED_USER_JSON" > authorized_user.json
+        env:
+          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+          GOOGLE_AUTHORIZED_USER_JSON: ${{ secrets.GOOGLE_AUTHORIZED_USER_JSON }}
+
+      - name: Run catch-up
+        run: python -u run_once.py
+        env:
+          TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+          TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+          SESSION_STRING: ${{ secrets.SESSION_STRING }}
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          SCHOOLS_JSON: ${{ secrets.SCHOOLS_JSON }}
+
+      - name: Save state
+        run: |
+          git config user.name "finbot"
+          git config user.email "finbot@users.noreply.github.com"
+          git add state.json
+          git commit -m "update state" || echo "no changes"
+          git push || echo "nothing to push"
