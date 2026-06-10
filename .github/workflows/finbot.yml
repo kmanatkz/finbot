@@ -28,11 +28,13 @@ jobs:
 
       - name: Write secret files
         run: |
-          printf '%s' "$GOOGLE_CREDENTIALS_JSON" > credentials.json
-          printf '%s' "$GOOGLE_AUTHORIZED_USER_JSON" > authorized_user.json
+          echo "$GOOGLE_CREDENTIALS_B64" | base64 -d > credentials.json
+          echo "$GOOGLE_AUTHORIZED_USER_B64" | base64 -d > authorized_user.json
+          echo "$SCHOOLS_JSON_B64" | base64 -d > schools.json
         env:
-          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
-          GOOGLE_AUTHORIZED_USER_JSON: ${{ secrets.GOOGLE_AUTHORIZED_USER_JSON }}
+          GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+          GOOGLE_AUTHORIZED_USER_B64: ${{ secrets.GOOGLE_AUTHORIZED_USER_B64 }}
+          SCHOOLS_JSON_B64: ${{ secrets.SCHOOLS_JSON_B64 }}
 
       - name: Run catch-up
         run: python -u run_once.py
@@ -41,7 +43,6 @@ jobs:
           TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
           SESSION_STRING: ${{ secrets.SESSION_STRING }}
           SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
-          SCHOOLS_JSON: ${{ secrets.SCHOOLS_JSON }}
 
       - name: Save state
         run: |
